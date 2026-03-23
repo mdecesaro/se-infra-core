@@ -1,0 +1,24 @@
+name: "Terraform Infrastructure"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    name: "Terraform Apply"
+    runs-on: [self-hosted, pi-cluster]
+
+    steps:
+      - name: Checkout Code
+        uses: action/checkout@v3
+      
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve 
