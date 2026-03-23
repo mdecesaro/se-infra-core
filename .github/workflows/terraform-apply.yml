@@ -10,16 +10,22 @@ jobs:
     name: "Terraform Apply"
     runs-on: [self-hosted, pi-cluster]
     
+    # Colocamos as env aqui para valerem para TODOS os steps abaixo
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # Estas 3 linhas abaixo são o "pulo do gato" para o MinIO:
+      AWS_REGION: "us-east-1"
+      AWS_EC2_METADATA_DISABLED: "true"
+      AWS_S3_ALLOW_BIN_PROCESS: "true"
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Terraform Init
-        run: terraform init
+        # O -reconfigure força o Terraform a esquecer o estado local anterior
+        run: terraform init -reconfigure
 
       - name: Terraform Plan
         run: terraform plan
