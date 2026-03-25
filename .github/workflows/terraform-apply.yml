@@ -12,11 +12,11 @@ jobs:
     
     # ADICIONE ESTAS LINHAS AQUI:
     permissions:
-      contents: read      # Para ler o código
+      contents: write      # Para ler o código
       pull-requests: write # Para postar comentários em PRs
       statuses: write     # Para atualizar o status do check
       checks: write       # Para mostrar o relatório no resumo
-      
+
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
