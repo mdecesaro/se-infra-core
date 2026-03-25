@@ -56,4 +56,4 @@ jobs:
       #
 
       - name: Terraform Apply
-        run: terraform apply #"tfplan.binary"
+        run: terraform apply -auto-approve #"tfplan.binary"
