@@ -34,7 +34,9 @@ jobs:
 
       # Geramos o plano primeiro para o Infracost ler a realidade
       - name: Terraform Plan
-        run: terraform plan #-out tfplan.binary
+        run: terraform plan 
+      
+      #-out tfplan.binary
 
       # - name: Infracost (Previsão de Custo)
       #  env:
@@ -54,4 +56,4 @@ jobs:
       #
 
       - name: Terraform Apply
-        run: terraform apply "tfplan.binary"
+        run: terraform apply #"tfplan.binary"
