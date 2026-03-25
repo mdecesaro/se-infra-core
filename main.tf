@@ -110,6 +110,11 @@ resource "helm_release" "kubecost" {
   }
 
   set {
+    name  = "kubecostProductConfigs.clusterId"
+    value = "pi-cluster"
+  }
+
+  set {
     name  = "prometheus.server.resources.requests.cpu"
     value = "150m"
   }
