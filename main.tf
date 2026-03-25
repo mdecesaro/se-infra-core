@@ -151,6 +151,6 @@ resource "kubernetes_persistent_volume_claim" "teste_custo" {
       }
     }
     # Dica para o Infracost tratar como um disco pago (GP2 da AWS)
-    storage_class_name = "gp2" 
+    storage_class_name = "local-path" 
   }
 }
