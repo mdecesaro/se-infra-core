@@ -57,3 +57,7 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve #"tfplan.binary"
+        env:
+          # O Terraform entende que TF_VAR_x preenche a variable "x"
+          TF_VAR_minio_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          TF_VAR_minio_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
