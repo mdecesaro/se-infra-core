@@ -10,13 +10,19 @@ jobs:
     name: "Terraform Apply"
     runs-on: [self-hosted, pi-cluster]
     
+    # ADICIONE ESTAS LINHAS AQUI:
+    permissions:
+      contents: read      # Para ler o código
+      pull-requests: write # Para postar comentários em PRs
+      statuses: write     # Para atualizar o status do check
+      checks: write       # Para mostrar o relatório no resumo
+      
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: "us-east-1"
       AWS_EC2_METADATA_DISABLED: "true"
       AWS_S3_ALLOW_BIN_PROCESS: "true"
-      # Injetamos a API Key no nível do Job para facilitar
       INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
 
     steps:
