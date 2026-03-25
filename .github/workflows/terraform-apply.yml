@@ -25,7 +25,6 @@ jobs:
       AWS_EC2_METADATA_DISABLED: "true"
       AWS_S3_ALLOW_BIN_PROCESS: "true"
       INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
-      # ADICIONE ESTAS DUAS LINHAS AQUI NO TOPO:
       TF_VAR_minio_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
       TF_VAR_minio_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 

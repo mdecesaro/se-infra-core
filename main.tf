@@ -89,3 +89,33 @@ resource "kubernetes_service" "ml_backend_svc" {
     }
   }
 }
+
+# Namespace dedicado para não misturar com o app de ML
+resource "kubernetes_namespace" "monitoring" {
+  metadata {
+    name = "kubecost"
+  }
+}
+
+# Instalação do analisador de custos
+resource "helm_release" "kubecost" {
+  name       = "kubecost"
+  repository = "https://kubecost.github.io/cost-analyzer/"
+  chart      = "cost-analyzer"
+  namespace  = kubernetes_namespace.monitoring.metadata[0].name
+
+  # Ajustes finos para o Raspberry Pi (Low Resources)
+  set {
+    name  = "prometheus.server.resources.requests.cpu"
+    value = "150m"
+  }
+  set {
+    name  = "prometheus.server.resources.requests.memory"
+    value = "300Mi"
+  }
+}
+
+# Output para você não ter que decorar o comando de acesso
+output "kubecost_ui" {
+  value = "Acesse o painel com: kubectl port-forward --namespace kubecost deploy/kubecost-cost-analyzer 9090"
+}
