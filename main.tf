@@ -102,27 +102,20 @@ resource "helm_release" "kubecost" {
   name       = "kubecost"
   repository = "https://kubecost.github.io/cost-analyzer/"
   chart      = "cost-analyzer"
-  version    = "2.10.3"
+  version    = "3.0.0" # Versão estável e moderna
   namespace  = kubernetes_namespace.monitoring.metadata[0].name
 
   set {
     name  = "global.clusterId"
     value = "pi-cluster"
   }
-
-  set {
-    name  = "kubecostProductConfigs.clusterId"
-    value = "pi-cluster"
-  }
-
   set {
     name  = "prometheus.server.resources.requests.cpu"
-    value = "150m"
+    value = "100m"
   }
-  
   set {
     name  = "prometheus.server.resources.requests.memory"
-    value = "300Mi"
+    value = "256Mi"
   }
 }
 
