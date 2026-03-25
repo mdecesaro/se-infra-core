@@ -17,11 +17,20 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.0"
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.0"
+    }
   }
 }
 
+
+locals {
+  kube_config = "/etc/rancher/k3s/k3s.yaml"
+}
+
 provider "kubernetes" {
-  config_path = "/etc/rancher/k3s/k3s.yaml"
+  config_path = local.kube_config
 }
 
 # --- Recursos da Sprint 3 ---

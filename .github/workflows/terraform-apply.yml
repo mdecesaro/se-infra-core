@@ -10,25 +10,41 @@ jobs:
     name: "Terraform Apply"
     runs-on: [self-hosted, pi-cluster]
     
-    # Colocamos as env aqui para valerem para TODOS os steps abaixo
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      # Estas 3 linhas abaixo são o "pulo do gato" para o MinIO:
       AWS_REGION: "us-east-1"
       AWS_EC2_METADATA_DISABLED: "true"
       AWS_S3_ALLOW_BIN_PROCESS: "true"
+      # Injetamos a API Key no nível do Job para facilitar
+      INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Terraform Init
-        # O -reconfigure força o Terraform a esquecer o estado local anterior
         run: terraform init -reconfigure
 
+      # Geramos o plano primeiro para o Infracost ler a realidade
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -out tfplan.binary
+
+      - name: Infracost (Previsão de Custo)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 1. Gera o JSON baseado no plano real do Terraform
+          infracost breakdown --path tfplan.binary \
+                              --format json \
+                              --out-file /tmp/infracost.json
+          
+          # 2. Posta o comentário no GitHub
+          infracost comment github --path /tmp/infracost.json \
+                                   --repo $GITHUB_REPOSITORY \
+                                   --commit $GITHUB_SHA \
+                                   --github-token $GITHUB_TOKEN \
+                                   --behavior update
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply "tfplan.binary"
