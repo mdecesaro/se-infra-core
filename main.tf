@@ -104,11 +104,16 @@ resource "helm_release" "kubecost" {
   chart      = "cost-analyzer"
   namespace  = kubernetes_namespace.monitoring.metadata[0].name
 
-  # Ajustes finos para o Raspberry Pi (Low Resources)
+  set {
+    name  = "global.clusterId"
+    value = "pi-cluster"
+  }
+
   set {
     name  = "prometheus.server.resources.requests.cpu"
     value = "150m"
   }
+  
   set {
     name  = "prometheus.server.resources.requests.memory"
     value = "300Mi"
