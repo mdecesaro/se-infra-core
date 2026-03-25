@@ -99,32 +99,20 @@ resource "kubernetes_namespace" "monitoring" {
 
 # Instalação do analisador de custos
 resource "helm_release" "kubecost" {
-  name       = "kubecost"
-  repository = "https://kubecost.github.io/cost-analyzer/"
-  chart      = "cost-analyzer"
-  version    = "2.9.6" # Versão estável e moderna
-  namespace  = kubernetes_namespace.monitoring.metadata[0].name
+  name             = "kubecost"
+  repository       = "https://kubecost.github.io/kubecost" # --repo
+  chart            = "kubecost"                           # kubecost
+  namespace        = "kubecost"                           # --namespace
+  create_namespace = true                                 # --create-namespace
 
-  # REGRA DE OURO DA V2.9: Definir nos dois lugares
+  # --set global.clusterId=pi-cluster
   set {
     name  = "global.clusterId"
     value = "pi-cluster"
   }
 
-  set {
-    name  = "kubecostProductConfigs.clusterId"
-    value = "pi-cluster"
-  }
-
-  # Recursos controlados para o Raspberry Pi
-  set {
-    name  = "prometheus.server.resources.requests.cpu"
-    value = "150m"
-  }
-  set {
-    name  = "prometheus.server.resources.requests.memory"
-    value = "300Mi"
-  }
+  # Dica: Mantivemos vazio de 'resources' para seguir exatamente 
+  # o comando que funcionou no seu terminal.
 }
 
 # Output para você não ter que decorar o comando de acesso
