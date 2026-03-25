@@ -1,56 +1,12 @@
-terraform {
-  backend "s3" {
-    bucket                      = "terraform-state"
-    key                         = "infra/terraform.tfstate"
-    region                      = "us-east-1"
-    endpoints                   = { s3 = "http://192.168.178.31:9000" }
-    force_path_style            = true
-    skip_credentials_validation = true
-    skip_metadata_api_check     = true
-    skip_region_validation      = true
-    skip_requesting_account_id  = true
-    skip_s3_checksum            = true
-  }
-
-  required_providers {
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.0"
-    }
-    
-    helm = {
-      source  = "hashicorp/helm"
-      version = "~> 2.0"
-    }
-  }
-}
-
-
-locals {
-  kube_config = "/etc/rancher/k3s/k3s.yaml"
-}
-
-provider "kubernetes" {
-  config_path = local.kube_config
-}
-
-# --- Recursos da Sprint 3 ---
-resource "kubernetes_namespace" "sprint3" {
-  metadata {
-    name = "automacao-github-actions"
-  }
-}
-
-# --- Recursos da Sprint 4 (Terreno do Backend ML) ---
-
 # 1. Namespace dedicado para a Aplicação
 resource "kubernetes_namespace" "ml_app" {
   metadata {
-    name = "ml-production"
+    # USANDO VARIÁVEL AQUI
+    name = var.namespace_ml 
   }
 }
 
-# 2. Deployment do Backend (O "Berço")
+# 2. Deployment do Backend
 resource "kubernetes_deployment" "ml_backend" {
   metadata {
     name      = "ml-backend"
@@ -78,24 +34,23 @@ resource "kubernetes_deployment" "ml_backend" {
       spec {
         container {
           name  = "backend-container"
-          # Imagem Placeholder até criarmos a nossa oficial no GHCR
           image = "python:3.11-slim"
           
-          # Comando para manter o pod vivo sem dar erro de 'crash'
           command = ["sleep", "infinity"]
 
           port {
             container_port = 8000
           }
 
-          # Variáveis de ambiente para conexão com o MinIO
+          # Variáveis de ambiente usando a variável pi_ip
           env {
             name  = "MINIO_ENDPOINT"
-            value = "192.168.178.31:9000"
+            # USANDO INTERPOLAÇÃO DE VARIÁVEL
+            value = "${var.pi_ip}:9000" 
           }
           env {
             name  = "MINIO_ACCESS_KEY"
-            value = "admin"
+            value = "admin" # Futuramente usaremos sensitive variables aqui
           }
           env {
             name  = "MINIO_SECRET_KEY"
@@ -104,11 +59,11 @@ resource "kubernetes_deployment" "ml_backend" {
 
           resources {
             limits = {
-              cpu    = "0.5"
+              cpu    = "500m"
               memory = "512Mi"
             }
             requests = {
-              cpu    = "0.2"
+              cpu    = "200m"
               memory = "256Mi"
             }
           }
@@ -118,7 +73,7 @@ resource "kubernetes_deployment" "ml_backend" {
   }
 }
 
-# 3. Service (Exposição via IP do Pi)
+# 3. Service
 resource "kubernetes_service" "ml_backend_svc" {
   metadata {
     name      = "ml-backend-service"
