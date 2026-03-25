@@ -34,23 +34,24 @@ jobs:
 
       # Geramos o plano primeiro para o Infracost ler a realidade
       - name: Terraform Plan
-        run: terraform plan -out tfplan.binary
+        run: terraform plan #-out tfplan.binary
 
-      - name: Infracost (Previsão de Custo)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # 1. Gera o JSON baseado no plano real do Terraform
-          infracost breakdown --path tfplan.binary \
-                              --format json \
-                              --out-file /tmp/infracost.json
-          
-          # 2. Posta o comentário no GitHub
-          infracost comment github --path /tmp/infracost.json \
-                                   --repo $GITHUB_REPOSITORY \
-                                   --commit $GITHUB_SHA \
-                                   --github-token $GITHUB_TOKEN \
-                                   --behavior update
+      # - name: Infracost (Previsão de Custo)
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  run: |
+      #    # 1. Gera o JSON baseado no plano real do Terraform
+      #    infracost breakdown --path tfplan.binary \
+      #                        --format json \
+      #                        --out-file /tmp/infracost.json
+      #    
+      #    # 2. Posta o comentário no GitHub
+      #    infracost comment github --path /tmp/infracost.json \
+      #                             --repo $GITHUB_REPOSITORY \
+      #                             --commit $GITHUB_SHA \
+      #                             --github-token $GITHUB_TOKEN \
+      #                             --behavior update
+      #
 
       - name: Terraform Apply
         run: terraform apply "tfplan.binary"

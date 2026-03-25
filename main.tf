@@ -17,6 +17,7 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.0"
     }
+    
     helm = {
       source  = "hashicorp/helm"
       version = "~> 2.0"
@@ -133,24 +134,5 @@ resource "kubernetes_service" "ml_backend_svc" {
       target_port = 8000
       node_port   = 30080
     }
-  }
-}
-
-
-# RECURSO DE TESTE: Simula um disco na AWS para ver o Infracost calcular
-resource "kubernetes_persistent_volume_claim" "teste_custo" {
-  metadata {
-    name = "disco-de-teste"
-    namespace = kubernetes_namespace.ml_app.metadata[0].name
-  }
-  spec {
-    access_modes = ["ReadWriteOnce"]
-    resources {
-      requests = {
-        storage = "100Gi" # O Infracost vai precificar esse storage!
-      }
-    }
-    # Dica para o Infracost tratar como um disco pago (GP2 da AWS)
-    storage_class_name = "local-path" 
   }
 }
