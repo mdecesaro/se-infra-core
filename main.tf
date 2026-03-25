@@ -1,7 +1,6 @@
 # 1. Namespace dedicado para a Aplicação
 resource "kubernetes_namespace" "ml_app" {
   metadata {
-    # USANDO VARIÁVEL AQUI
     name = var.namespace_ml 
   }
 }
@@ -45,16 +44,15 @@ resource "kubernetes_deployment" "ml_backend" {
           # Variáveis de ambiente usando a variável pi_ip
           env {
             name  = "MINIO_ENDPOINT"
-            # USANDO INTERPOLAÇÃO DE VARIÁVEL
             value = "${var.pi_ip}:9000" 
           }
           env {
             name  = "MINIO_ACCESS_KEY"
-            value = "admin" # Futuramente usaremos sensitive variables aqui
+            value = var.minio_access_key
           }
           env {
             name  = "MINIO_SECRET_KEY"
-            value = "senha_devops_123"
+            value = var.minio_secret_key
           }
 
           resources {
