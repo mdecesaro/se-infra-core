@@ -113,15 +113,15 @@ resource "helm_release" "kubecost" {
 
   # DIMINUINDO A FOME DO AGGREGATOR (A solução do problema)
   set {
-    name  = "kubecostAggregator.resources.requests.memory"
-    value = "512Mi" # De 3Gi para 512Mi
+    name  = "aggregator.resources.requests.memory"
+    value = "512Mi"
   }
 
   set {
-    name  = "kubecostAggregator.resources.requests.cpu"
+    name  = "aggregator.resources.requests.cpu"
     value = "100m"
   }
-  
+
   # Dica: Mantivemos vazio de 'resources' para seguir exatamente 
   # o comando que funcionou no seu terminal.
 }
