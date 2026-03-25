@@ -102,6 +102,7 @@ resource "helm_release" "kubecost" {
   name       = "kubecost"
   repository = "https://kubecost.github.io/cost-analyzer/"
   chart      = "cost-analyzer"
+  version    = "2.10.3"
   namespace  = kubernetes_namespace.monitoring.metadata[0].name
 
   set {
