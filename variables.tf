@@ -5,6 +5,7 @@ variable "namespace_ml" {
 
 variable "namespace_monitoring" {
   type    = string
+  description = "Namespace para ferramentas de observabilidade"
   default = "kubecost"
 }
 
