@@ -114,12 +114,18 @@ resource "helm_release" "kubecost" {
   # DIMINUINDO A FOME DO AGGREGATOR (A solução do problema)
   set {
     name  = "aggregator.resources.requests.memory"
-    value = "512Mi"
+    value = "1Gi"
+  }
+
+  # Aumenta a paciência do Kubernetes para o Pi não dar "Unhealthy"
+  set {
+    name  = "aggregator.readinessProbe.initialDelaySeconds"
+    value = "60"
   }
 
   set {
-    name  = "aggregator.resources.requests.cpu"
-    value = "100m"
+    name  = "aggregator.readinessProbe.failureThreshold"
+    value = "30"
   }
 
   # Dica: Mantivemos vazio de 'resources' para seguir exatamente 
