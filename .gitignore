@@ -1,4 +1,6 @@
 k3s.yaml
 .terraform/
+.terraform.lock.hcl
 *.tfstate*
 tfplan.binary
+setup-tf.sh
