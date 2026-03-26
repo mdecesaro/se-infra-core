@@ -90,6 +90,31 @@ resource "kubernetes_service" "ml_backend_svc" {
   }
 }
 
+# 1. Instalar o Prometheus (O "Banco de Dados" de métricas)
+resource "helm_release" "prometheus" {
+  name             = "prometheus"
+  repository       = "https://prometheus-community.github.io/helm-charts"
+  chart            = "prometheus"
+  namespace        = "prometheus-system"
+  create_namespace = true
+
+  # Configuração "Light" para o Raspberry Pi não explodir
+  set {
+    name  = "server.persistentVolume.enabled"
+    value = "false" # Usa memória temporária para não travar o SD Card
+  }
+  
+  set {
+    name  = "alertmanager.enabled"
+    value = "false" # Desativa o que não é essencial
+  }
+
+  set {
+    name  = "server.resources.requests.memory"
+    value = "256Mi"
+  }
+}
+
 resource "helm_release" "opencost" {
   name       = "opencost"
   repository = "https://opencost.github.io/opencost-helm-chart"
@@ -97,6 +122,13 @@ resource "helm_release" "opencost" {
   namespace  = "opencost"
   create_namespace = true
 
+  depends_on = [helm_release.prometheus] # Só instala se o Prometheus estiver OK
+
+  set {
+    name  = "opencost.exporter.prometheus_config.external_prometheus_url"
+    value = "http://prometheus-server.prometheus-system.svc.cluster.local"
+  }
+  
   # O OpenCost precisa saber o nome do seu cluster
   set {
     name  = "opencost.exporter.cluster_id"
