@@ -1,4 +1,3 @@
-# --- PROMETHEUS (O BANCO DE DADOS) ---
 resource "helm_release" "prometheus" {
   name             = "prometheus"
   repository       = "https://prometheus-community.github.io/helm-charts"
@@ -8,9 +7,9 @@ resource "helm_release" "prometheus" {
 
   set {
     name  = "server.persistentVolume.enabled"
-    value = "false" 
+    value = "false"
   }
-  
+
   set {
     name  = "alertmanager.enabled"
     value = "false"
@@ -19,6 +18,17 @@ resource "helm_release" "prometheus" {
   set {
     name  = "server.resources.requests.memory"
     value = "256Mi"
+  }
+
+  # --- O PU-LO-DO-GATO: Conecta ao OpenCost ---
+  set {
+    name  = "extraScrapeConfigs"
+    value = <<EOF
+- job_name: 'opencost'
+  metrics_path: '/metrics'
+  static_configs:
+    - targets: ['opencost.opencost.svc.cluster.local:9003']
+EOF
   }
 }
 
@@ -34,6 +44,26 @@ resource "helm_release" "opencost" {
     helm_release.prometheus,
     kubernetes_config_map.opencost_pricing
   ]
+
+  set {
+    name  = "opencost.prometheus.service_monitor.enabled"
+    value = "false" 
+  }
+
+  set {
+    name  = "opencost.prometheus.scrape"
+    value = "true"
+  }
+
+  set {
+    name  = "opencost.service.annotations.prometheus\\.io/scrape"
+    value = "true"
+  }
+
+  set {
+    name  = "opencost.service.annotations.prometheus\\.io/port"
+    value = "9003"
+  }
 
   set {
     name  = "opencost.exporter.prometheus_config.external_prometheus_url"

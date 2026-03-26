@@ -17,3 +17,8 @@ output "deployment_status" {
   description = "Namespace de produção criado"
   value       = kubernetes_namespace.ml_app.metadata[0].name
 }
+
+output "grafana_url" {
+  description = "Painel Visual de Métricas e Custos"
+  value       = "http://${var.pi_ip}:32000"
+}
