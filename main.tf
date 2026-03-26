@@ -90,54 +90,27 @@ resource "kubernetes_service" "ml_backend_svc" {
   }
 }
 
-# Namespace dedicado para não misturar com o app de ML
-resource "kubernetes_namespace" "monitoring" {
-  metadata {
-    name = "kubecost"
-  }
-}
+resource "helm_release" "opencost" {
+  name       = "opencost"
+  repository = "https://opencost.github.io/opencost-helm-chart"
+  chart      = "opencost"
+  namespace  = "opencost"
+  create_namespace = true
 
-# Instalação do analisador de custos
-resource "helm_release" "kubecost" {
-  name             = "kubecost"
-  repository       = "https://kubecost.github.io/kubecost" # --repo
-  chart            = "kubecost"                           # kubecost
-  namespace        = "kubecost"                           # --namespace
-  create_namespace = true                                 # --create-namespace
-
-  # --set global.clusterId=pi-cluster
+  # O OpenCost precisa saber o nome do seu cluster
   set {
-    name  = "global.clusterId"
+    name  = "opencost.exporter.cluster_id"
     value = "pi-cluster"
   }
 
+  # Configuração de recursos humilde para o Pi
   set {
-    name  = "aggregator.clickhouse.enabled"
-    value = "false"
-  }
-
-  # DIMINUINDO A FOME DO AGGREGATOR (A solução do problema)
-  set {
-    name  = "aggregator.resources.requests.memory"
-    value = "1Gi"
-  }
-
-  # Aumenta a paciência do Kubernetes para o Pi não dar "Unhealthy"
-  set {
-    name  = "aggregator.readinessProbe.initialDelaySeconds"
-    value = "60"
+    name  = "opencost.exporter.resources.requests.memory"
+    value = "128Mi" # Olha a diferença! De 3Gi para 128Mi
   }
 
   set {
-    name  = "aggregator.readinessProbe.failureThreshold"
-    value = "30"
+    name  = "opencost.exporter.resources.limits.memory"
+    value = "256Mi"
   }
-
-  # Dica: Mantivemos vazio de 'resources' para seguir exatamente 
-  # o comando que funcionou no seu terminal.
-}
-
-# Output para você não ter que decorar o comando de acesso
-output "kubecost_ui" {
-  value = "Acesse o painel com: kubectl port-forward --namespace kubecost deploy/kubecost-cost-analyzer 9090"
 }
