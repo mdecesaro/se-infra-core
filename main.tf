@@ -111,6 +111,11 @@ resource "helm_release" "kubecost" {
     value = "pi-cluster"
   }
 
+  set {
+    name  = "aggregator.clickhouse.enabled"
+    value = "false"
+  }
+
   # DIMINUINDO A FOME DO AGGREGATOR (A solução do problema)
   set {
     name  = "aggregator.resources.requests.memory"
