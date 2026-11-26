@@ -23,7 +23,7 @@
     owner: root
     group: root
     mode: "0755"
-    
+
 - name: Configure K3s kubelet swap behavior
   ansible.builtin.template:
     src: kubelet-swap.conf.j2
@@ -31,3 +31,26 @@
     owner: root
     group: root
     mode: "0644"
+
+- name: Check if K3s is installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/k3s
+  register: k3s_binary
+
+- name: Download K3s installation script
+  ansible.builtin.get_url:
+    url: https://get.k3s.io
+    dest: /tmp/k3s-install.sh
+    owner: root
+    group: root
+    mode: "0755"
+  when: not k3s_binary.stat.exists
+
+- name: Install K3s server
+  ansible.builtin.command:
+    cmd: /tmp/k3s-install.sh
+  environment:
+    INSTALL_K3S_CHANNEL: "{{ k3s_install_channel }}"
+    INSTALL_K3S_EXEC: server
+    INSTALL_K3S_VERSION: "{{ k3s_version }}"
+  when: not k3s_binary.stat.exists
