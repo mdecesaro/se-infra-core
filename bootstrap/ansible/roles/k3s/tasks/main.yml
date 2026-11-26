@@ -1,0 +1,33 @@
+
+---
+- name: Create K3s configuration directory
+  ansible.builtin.file:
+    path: "{{ k3s_config_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure K3s
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: "{{ k3s_config_file }}"
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Create K3s kubelet configuration directory
+  ansible.builtin.file:
+    path: "{{ k3s_kubelet_config_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+    
+- name: Configure K3s kubelet swap behavior
+  ansible.builtin.template:
+    src: kubelet-swap.conf.j2
+    dest: "{{ k3s_kubelet_swap_config }}"
+    owner: root
+    group: root
+    mode: "0644"
