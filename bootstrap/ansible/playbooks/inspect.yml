@@ -1,0 +1,14 @@
+---
+- name: Inspect Raspberry Pi infrastructure host
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Display host information
+      ansible.builtin.debug:
+        msg:
+          - "Hostname: {{ ansible_facts['hostname'] }}"
+          - "OS: {{ ansible_facts['distribution'] }}"
+          - "OS version: {{ ansible_facts['distribution_version'] }}"
+          - "Architecture: {{ ansible_facts['architecture'] }}"
+          - "Kernel: {{ ansible_facts['kernel'] }}"
